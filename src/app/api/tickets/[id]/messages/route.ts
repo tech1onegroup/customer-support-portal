@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { authenticateRequest } from "@/lib/api-auth";
+import { sanitizeInput } from "@/lib/sanitize";
 
 export async function POST(
   request: Request,
@@ -42,11 +43,13 @@ export async function POST(
     );
   }
 
+  const sanitizedMessage = sanitizeInput(message);
+
   const ticketMessage = await prisma.ticketMessage.create({
     data: {
       ticketId: id,
       senderId: customer.id,
-      message: message.trim(),
+      message: sanitizedMessage,
       isInternal: false,
     },
   });

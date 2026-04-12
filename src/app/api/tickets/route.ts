@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { authenticateRequest } from "@/lib/api-auth";
+import { sanitizeInput } from "@/lib/sanitize";
 
 export async function GET(request: Request) {
   const auth = await authenticateRequest(request);
@@ -51,7 +52,9 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { category, subject, description } = body;
+    const { category } = body;
+    const subject = body.subject ? sanitizeInput(body.subject) : "";
+    const description = body.description ? sanitizeInput(body.description) : "";
 
     if (!category || !subject || !description) {
       return NextResponse.json(

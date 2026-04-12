@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { authenticateRequest } from "@/lib/api-auth";
 import { uploadFile } from "@/lib/s3";
+import { createNotification } from "@/lib/notifications";
 
 export async function POST(request: Request) {
   const auth = await authenticateRequest(request);
@@ -17,6 +18,22 @@ export async function POST(request: Request) {
 
     if (!file) {
       return NextResponse.json({ error: "File required" }, { status: 400 });
+    }
+
+    const ALLOWED_MIME_TYPES = [
+      "application/pdf",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+    ];
+
+    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+      return NextResponse.json(
+        { error: "File type not allowed. Accepted: PDF, DOC, DOCX, JPG, JPEG, PNG" },
+        { status: 400 }
+      );
     }
 
     if (file.size > 25 * 1024 * 1024) {
@@ -52,6 +69,16 @@ export async function POST(request: Request) {
         uploadedBy: isAdmin ? "ADMIN" : "CUSTOMER",
       },
     });
+
+    // Send notification when admin uploads a document for a customer
+    if (resolvedCustomerId && isAdmin) {
+      await createNotification({
+        customerId: resolvedCustomerId,
+        type: "DOCUMENT_ADDED",
+        title: "New Document Available",
+        body: `A new document "${title}" has been uploaded to your account.`,
+      });
+    }
 
     return NextResponse.json({ document });
   } catch (error) {

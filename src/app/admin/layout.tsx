@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { AdminSidebar } from "@/components/shared/admin-sidebar";
+import { ErrorBoundary } from "@/components/shared/error-boundary";
 
 export default function AdminLayout({
   children,
@@ -38,7 +39,9 @@ export default function AdminLayout({
   return (
     <div className="flex min-h-screen">
       <AdminSidebar />
-      <main className="flex-1 bg-gray-50 p-8">{children}</main>
+      <main className="flex-1 bg-gray-50 p-8">
+        <ErrorBoundary>{children}</ErrorBoundary>
+      </main>
     </div>
   );
 }

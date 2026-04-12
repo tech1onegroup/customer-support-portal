@@ -2,8 +2,10 @@
 
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { PortalSidebar } from "@/components/shared/portal-sidebar";
+import { ErrorBoundary } from "@/components/shared/error-boundary";
+import { Building2, Menu, X } from "lucide-react";
 
 export default function PortalLayout({
   children,
@@ -12,12 +14,18 @@ export default function PortalLayout({
 }) {
   const { user, isLoading } = useAuth();
   const router = useRouter();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (!isLoading && !user) {
       router.push("/login");
     }
   }, [user, isLoading, router]);
+
+  // Close sidebar on route change
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [children]);
 
   if (isLoading) {
     return (
@@ -31,8 +39,50 @@ export default function PortalLayout({
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <PortalSidebar />
-      <main className="flex-1 p-8">{children}</main>
+      {/* Desktop sidebar - always visible */}
+      <div className="hidden lg:block">
+        <PortalSidebar />
+      </div>
+
+      {/* Mobile backdrop */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Mobile sidebar drawer */}
+      <div
+        className={`fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out lg:hidden ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <PortalSidebar />
+      </div>
+
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Mobile top bar */}
+        <div className="lg:hidden flex items-center gap-3 px-4 py-3 bg-gray-900 text-white">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-white/10 transition-colors"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+          <div className="flex items-center gap-2">
+            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-blue-500 to-blue-600">
+              <Building2 className="h-4 w-4 text-white" />
+            </div>
+            <span className="text-sm font-bold tracking-tight">ONE Group</span>
+          </div>
+        </div>
+
+        <main className="flex-1 p-4 md:p-8">
+          <ErrorBoundary>{children}</ErrorBoundary>
+        </main>
+      </div>
     </div>
   );
 }

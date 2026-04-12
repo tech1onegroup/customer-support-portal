@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/api-auth";
+import { createNotification } from "@/lib/notifications";
 import { z } from "zod";
 
 const schema = z.object({
@@ -75,6 +76,21 @@ export async function POST(request: Request) {
         },
       });
     });
+
+    // Send payment confirmation notification
+    const booking = await prisma.booking.findFirst({
+      where: { paymentSchedule: { some: { id: scheduleId } } },
+      select: { customerId: true },
+    });
+
+    if (booking) {
+      await createNotification({
+        customerId: booking.customerId,
+        type: "PAYMENT_CONFIRMATION",
+        title: "Payment Recorded",
+        body: `Your payment of Rs. ${amount.toLocaleString("en-IN")} has been recorded successfully.`,
+      });
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

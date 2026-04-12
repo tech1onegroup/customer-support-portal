@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { authenticateRequest } from "@/lib/api-auth";
+import { sanitizeInput } from "@/lib/sanitize";
 
 export async function GET(request: Request) {
   const auth = await authenticateRequest(request);
@@ -64,7 +65,10 @@ export async function PATCH(request: Request) {
   const updateData: Record<string, string> = {};
   for (const field of allowedFields) {
     if (body[field] !== undefined) {
-      updateData[field] = body[field];
+      updateData[field] =
+        typeof body[field] === "string"
+          ? sanitizeInput(body[field])
+          : body[field];
     }
   }
 

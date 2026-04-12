@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/api-auth";
+import { sanitizeInput } from "@/lib/sanitize";
+import { createNotification } from "@/lib/notifications";
 
 export async function GET(request: Request) {
   const auth = await requireAdmin(request);
@@ -122,11 +124,12 @@ export async function PATCH(request: Request) {
 
     // Add reply if provided
     if (reply) {
+      const sanitizedReply = sanitizeInput(reply);
       await prisma.ticketMessage.create({
         data: {
           ticketId,
           senderId: auth.user.userId,
-          message: reply,
+          message: sanitizedReply,
         },
       });
 
@@ -138,6 +141,16 @@ export async function PATCH(request: Request) {
         });
       }
     }
+
+    // Send ticket update notification
+    await createNotification({
+      customerId: ticket.customerId,
+      type: "TICKET_UPDATE",
+      title: "Ticket Updated",
+      body: reply
+        ? `Your ticket #${ticket.ticketRef} has a new reply from support.`
+        : `Your ticket #${ticket.ticketRef} status changed to ${status}.`,
+    });
 
     return NextResponse.json({ success: true });
   } catch (error) {

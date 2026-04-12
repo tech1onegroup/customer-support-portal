@@ -54,10 +54,13 @@ export async function POST(request: Request) {
     // Send OTP via MSG91 (in dev mode, logs to console)
     await sendOtp(fullPhone);
 
+    if (isDev) {
+      console.log(`[DEV] OTP for ${phone}: ${otp}`);
+    }
+
     return NextResponse.json({
       success: true,
       message: "OTP sent successfully",
-      ...(isDev && { otp }),
     });
   } catch (error) {
     console.error("Send OTP error:", error);

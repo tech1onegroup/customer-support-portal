@@ -16,6 +16,7 @@ import {
   Settings,
   BarChart3,
   MessageSquare,
+  ClipboardCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -34,6 +35,7 @@ const navGroups = [
       { href: "/admin/customers", label: "Customers", icon: Users },
       { href: "/admin/bookings/import", label: "Import Bookings", icon: FileUp },
       { href: "/admin/projects", label: "Projects", icon: Building2 },
+      { href: "/admin/community", label: "Community", icon: Users },
     ],
   },
   {
@@ -43,6 +45,7 @@ const navGroups = [
       { href: "/admin/tickets", label: "Tickets", icon: MessageSquare },
       { href: "/admin/construction", label: "Construction", icon: HardHat },
       { href: "/admin/documents", label: "Documents", icon: FileText },
+      { href: "/admin/possession", label: "Possession", icon: ClipboardCheck },
     ],
   },
 ];
