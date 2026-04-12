@@ -58,7 +58,7 @@ export function AdminSidebar() {
     pathname === href || pathname.startsWith(href + "/");
 
   return (
-    <aside className="flex flex-col w-64 min-h-screen bg-gradient-to-b from-slate-950 to-slate-900 text-white">
+    <aside className="flex flex-col w-64 h-screen sticky top-0 bg-gradient-to-b from-slate-950 to-slate-900 text-white overflow-y-auto">
       {/* Logo */}
       <div className="px-6 pt-6 pb-4">
         <div className="flex items-center gap-3">

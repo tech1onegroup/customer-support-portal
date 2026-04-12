@@ -65,7 +65,7 @@ export function PortalSidebar() {
   const { user, logout } = useAuth();
 
   return (
-    <aside className="flex flex-col w-64 min-h-screen bg-gradient-to-b from-gray-900 via-gray-900 to-gray-950 text-gray-300">
+    <aside className="flex flex-col w-64 h-screen sticky top-0 bg-gradient-to-b from-gray-900 via-gray-900 to-gray-950 text-gray-300 overflow-y-auto">
       {/* Logo */}
       <div className="px-5 pt-6 pb-5">
         <div className="flex items-center gap-3">

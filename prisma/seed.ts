@@ -63,8 +63,13 @@ async function main() {
     await prisma.constructionUpdate.create({ data: { projectId: p1.id, title: u.t, stage: u.s, date: new Date(u.d), mediaType: "PHOTO", mediaUrl: "https://placehold.co/800x600/e2e8f0/475569?text="+encodeURIComponent(u.t), source: "MANUAL" } });
   }
 
-  for (const d of ["Booking Form","Allotment Letter","Agreement to Sell","Demand Letter"]) {
-    await prisma.document.create({ data: { customerId: c1.id, bookingId: b1.id, type: "BOOKING_FORM", title: d+" - B-61/04", fileUrl: "#", fileSize: 256000, mimeType: "application/pdf", uploadedBy: "ADMIN" } });
+  for (const d of [
+    { name: "Booking Form", file: "Booking-Form-B6104.pdf" },
+    { name: "Allotment Letter", file: "Allotment-Letter-B6104.pdf" },
+    { name: "Agreement to Sell", file: "Agreement-to-Sell-B6104.pdf" },
+    { name: "Demand Letter", file: "Demand-Letter-B6104.pdf" },
+  ]) {
+    await prisma.document.create({ data: { customerId: c1.id, bookingId: b1.id, type: "BOOKING_FORM", title: d.name+" - B-61/04", fileUrl: `/uploads/documents/${d.file}`, fileSize: 256000, mimeType: "application/pdf", uploadedBy: "ADMIN" } });
   }
 
   await prisma.ticket.create({ data: { ticketRef: "TKT-001", customerId: c1.id, category: "PAYMENT_DISPUTE", subject: "Amount clarification", description: "Demand letter vs plan mismatch", status: "IN_PROGRESS", priority: "HIGH", assignedTo: admin.id, messages: { create: [{ senderId: cu1.id, message: "Check demand letter" },{ senderId: admin.id, message: "Looking into it" }] } } });
