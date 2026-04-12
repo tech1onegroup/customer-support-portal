@@ -201,27 +201,14 @@ export default function DocumentsPage() {
             All your property documents in one place
           </p>
         </div>
-        <div>
-          <input
-            type="file"
-            id="doc-upload-input"
-            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-            className="hidden"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) handleFileUpload(file);
-              e.target.value = "";
-            }}
-          />
-          <Button
-            className="bg-violet-600 hover:bg-violet-700 shadow-sm gap-2"
-            disabled={uploading}
-            onClick={() => document.getElementById("doc-upload-input")?.click()}
-          >
-            <Upload className="h-4 w-4" />
-            {uploading ? "Uploading..." : "Upload Document"}
-          </Button>
-        </div>
+        <Button
+          className="bg-violet-600 hover:bg-violet-700 shadow-sm gap-2"
+          disabled={uploading}
+          onClick={() => document.getElementById("doc-drop-input")?.click()}
+        >
+          <Upload className="h-4 w-4" />
+          {uploading ? "Uploading..." : "Upload Document"}
+        </Button>
       </div>
 
       {/* Stats Cards */}
