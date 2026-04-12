@@ -15,6 +15,7 @@ import {
   LogOut,
   Settings,
   BarChart3,
+  MessageSquare,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -39,6 +40,7 @@ const navGroups = [
     label: "Operations",
     items: [
       { href: "/admin/payments", label: "Payments", icon: CreditCard },
+      { href: "/admin/tickets", label: "Tickets", icon: MessageSquare },
       { href: "/admin/construction", label: "Construction", icon: HardHat },
       { href: "/admin/documents", label: "Documents", icon: FileText },
     ],
