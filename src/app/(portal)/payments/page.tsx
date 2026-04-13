@@ -165,7 +165,7 @@ export default function PaymentsPage() {
           value: formatCurrency(data.totalAmount),
           subtitle: "Agreement value",
           icon: Wallet,
-          gradient: "from-slate-600 to-slate-800",
+          gradient: "from-primary to-primary/90",
           iconBg: "bg-white/20",
         },
         {
@@ -173,7 +173,7 @@ export default function PaymentsPage() {
           value: formatCurrency(data.totalPaid),
           subtitle: `${paidPercent}% completed`,
           icon: TrendingUp,
-          gradient: "from-emerald-500 to-emerald-700",
+          gradient: "from-accent to-accent/90",
           iconBg: "bg-white/20",
         },
         {
@@ -181,7 +181,7 @@ export default function PaymentsPage() {
           value: formatCurrency(data.totalDue),
           subtitle: "Remaining balance",
           icon: CircleDollarSign,
-          gradient: "from-rose-500 to-rose-700",
+          gradient: "from-primary/80 to-primary",
           iconBg: "bg-white/20",
         },
         {
@@ -191,7 +191,7 @@ export default function PaymentsPage() {
             : "All Paid",
           subtitle: data.nextDueDate ? formatDate(data.nextDueDate) : "No pending dues",
           icon: CalendarClock,
-          gradient: "from-violet-500 to-violet-700",
+          gradient: "from-accent/80 to-accent",
           iconBg: "bg-white/20",
         },
       ]
@@ -214,7 +214,7 @@ export default function PaymentsPage() {
           <select
             value={selectedBooking}
             onChange={(e) => setSelectedBooking(e.target.value)}
-            className="border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-white shadow-sm focus:ring-2 focus:ring-violet-500 focus:border-transparent outline-none transition-all"
+            className="border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-white shadow-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
           >
             {bookings.map((b) => (
               <option key={b.id} value={b.id}>
@@ -264,12 +264,12 @@ export default function PaymentsPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-emerald-600" />
+                <TrendingUp className="h-4 w-4 text-primary" />
                 <span className="text-sm font-semibold text-gray-700">
                   Payment Progress
                 </span>
               </div>
-              <span className="text-sm font-bold text-emerald-600">
+              <span className="text-sm font-bold text-primary">
                 {paidPercent}% Paid
               </span>
             </div>
@@ -360,7 +360,7 @@ export default function PaymentsPage() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-8 gap-1.5 text-violet-600 hover:text-violet-700 hover:bg-violet-50"
+                              className="h-8 gap-1.5 text-primary hover:text-primary/80 hover:bg-primary/10"
                               onClick={() =>
                                 window.open(
                                   `/api/payments/receipt?paymentId=${item.payment!.id}`,

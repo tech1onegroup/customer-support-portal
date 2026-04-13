@@ -36,21 +36,21 @@ const typeIcons: Record<string, React.ElementType> = {
 };
 
 const typeBorderColors: Record<string, string> = {
-  PAYMENT_REMINDER: "border-l-emerald-500",
-  PAYMENT_CONFIRMATION: "border-l-emerald-500",
-  CONSTRUCTION_UPDATE: "border-l-blue-500",
-  DOCUMENT_ADDED: "border-l-purple-500",
-  TICKET_UPDATE: "border-l-orange-500",
-  ANNOUNCEMENT: "border-l-rose-500",
+  PAYMENT_REMINDER: "border-l-primary",
+  PAYMENT_CONFIRMATION: "border-l-primary",
+  CONSTRUCTION_UPDATE: "border-l-accent",
+  DOCUMENT_ADDED: "border-l-primary",
+  TICKET_UPDATE: "border-l-accent",
+  ANNOUNCEMENT: "border-l-primary",
 };
 
 const typeIconColors: Record<string, { bg: string; text: string }> = {
-  PAYMENT_REMINDER: { bg: "bg-emerald-100", text: "text-emerald-600" },
-  PAYMENT_CONFIRMATION: { bg: "bg-emerald-100", text: "text-emerald-600" },
-  CONSTRUCTION_UPDATE: { bg: "bg-blue-100", text: "text-blue-600" },
-  DOCUMENT_ADDED: { bg: "bg-purple-100", text: "text-purple-600" },
-  TICKET_UPDATE: { bg: "bg-orange-100", text: "text-orange-600" },
-  ANNOUNCEMENT: { bg: "bg-rose-100", text: "text-rose-600" },
+  PAYMENT_REMINDER: { bg: "bg-primary/10", text: "text-primary" },
+  PAYMENT_CONFIRMATION: { bg: "bg-primary/10", text: "text-primary" },
+  CONSTRUCTION_UPDATE: { bg: "bg-accent/10", text: "text-accent" },
+  DOCUMENT_ADDED: { bg: "bg-primary/10", text: "text-primary" },
+  TICKET_UPDATE: { bg: "bg-accent/10", text: "text-accent" },
+  ANNOUNCEMENT: { bg: "bg-primary/10", text: "text-primary" },
 };
 
 function formatRelativeTime(dateStr: string): string {
@@ -161,7 +161,7 @@ export default function NotificationsPage() {
         <div className="flex items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-gray-900 flex items-center gap-3">
-              <BellRing className="h-8 w-8 text-amber-500" />
+              <BellRing className="h-8 w-8 text-primary" />
               Notifications
             </h1>
             <p className="text-gray-500 mt-1 ml-11">
@@ -169,7 +169,7 @@ export default function NotificationsPage() {
             </p>
           </div>
           {unreadCount > 0 && (
-            <Badge className="bg-rose-500 text-white border-0 font-semibold px-3 py-1 text-sm shadow-sm">
+            <Badge className="bg-primary text-primary-foreground border-0 font-semibold px-3 py-1 text-sm shadow-sm">
               {unreadCount} unread
             </Badge>
           )}
@@ -221,7 +221,7 @@ export default function NotificationsPage() {
                   ${borderColor}
                   ${
                     !notification.isRead
-                      ? "bg-gradient-to-r from-blue-50/60 to-white shadow-md shadow-blue-100/50 ring-1 ring-blue-100/50 hover:shadow-lg hover:shadow-blue-100/50"
+                      ? "bg-gradient-to-r from-primary/5 to-white shadow-md shadow-primary/10 ring-1 ring-primary/10 hover:shadow-lg hover:shadow-primary/10"
                       : "bg-white border border-gray-100 shadow-sm hover:shadow-md hover:bg-gray-50/50"
                   }
                 `}
@@ -272,7 +272,7 @@ export default function NotificationsPage() {
 
                   {/* Unread indicator */}
                   {!notification.isRead && (
-                    <div className="h-2.5 w-2.5 rounded-full bg-blue-500 flex-shrink-0 mt-1.5 animate-pulse" />
+                    <div className="h-2.5 w-2.5 rounded-full bg-primary flex-shrink-0 mt-1.5 animate-pulse" />
                   )}
                 </CardContent>
               </Card>

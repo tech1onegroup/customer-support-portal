@@ -58,18 +58,18 @@ export function AdminSidebar() {
     pathname === href || pathname.startsWith(href + "/");
 
   return (
-    <aside className="flex flex-col w-64 h-screen sticky top-0 bg-gradient-to-b from-slate-950 to-slate-900 text-white overflow-y-auto">
+    <aside className="flex flex-col w-64 h-screen sticky top-0 bg-[#1a1a1c] text-white overflow-y-auto">
       {/* Logo */}
       <div className="px-6 pt-6 pb-4">
         <div className="flex items-center gap-3">
-          <div className="h-9 w-9 rounded-lg bg-indigo-600 flex items-center justify-center font-bold text-sm">
+          <div className="h-9 w-9 rounded-lg bg-primary flex items-center justify-center font-bold text-sm text-primary-foreground">
             OG
           </div>
           <div>
             <h1 className="text-lg font-bold tracking-tight">ONE Group</h1>
             <Badge
               variant="secondary"
-              className="mt-0.5 bg-indigo-500/20 text-indigo-300 border-indigo-500/30 text-[10px] px-1.5 py-0 font-medium"
+              className="mt-0.5 bg-primary/20 text-accent border-primary/30 text-[10px] px-1.5 py-0 font-medium"
             >
               Admin Panel
             </Badge>
@@ -77,13 +77,13 @@ export function AdminSidebar() {
         </div>
       </div>
 
-      <div className="mx-4 h-px bg-slate-800" />
+      <div className="mx-4 h-px bg-white/10" />
 
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4 space-y-5 overflow-y-auto">
         {navGroups.map((group) => (
           <div key={group.label}>
-            <p className="px-3 mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+            <p className="px-3 mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-white/40">
               {group.label}
             </p>
             <div className="space-y-0.5">
@@ -94,14 +94,14 @@ export function AdminSidebar() {
                   className={cn(
                     "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all duration-150 relative",
                     isActive(item.href)
-                      ? "bg-slate-800/80 text-white border-l-2 border-indigo-500 pl-[10px]"
-                      : "text-slate-400 hover:bg-slate-800/50 hover:text-slate-200"
+                      ? "bg-white/10 text-white border-l-2 border-primary pl-[10px]"
+                      : "text-white/50 hover:bg-white/5 hover:text-white/80"
                   )}
                 >
                   <item.icon
                     className={cn(
                       "h-4 w-4 flex-shrink-0",
-                      isActive(item.href) ? "text-indigo-400" : ""
+                      isActive(item.href) ? "text-accent" : ""
                     )}
                   />
                   {item.label}
@@ -112,26 +112,26 @@ export function AdminSidebar() {
         ))}
       </nav>
 
-      <div className="mx-4 h-px bg-slate-800" />
+      <div className="mx-4 h-px bg-white/10" />
 
       {/* Admin info */}
       <div className="p-4">
         <div className="flex items-center gap-3 mb-3">
-          <div className="h-8 w-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-xs font-bold">
+          <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-xs font-bold text-primary-foreground">
             {(user?.name || "A").charAt(0).toUpperCase()}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate text-slate-200">
+            <p className="text-sm font-medium truncate text-white/80">
               {user?.name || "Admin"}
             </p>
-            <p className="text-[11px] text-slate-500">{user?.role}</p>
+            <p className="text-[11px] text-white/40">{user?.role}</p>
           </div>
         </div>
         <Button
           variant="ghost"
           size="sm"
           onClick={logout}
-          className="w-full justify-start text-slate-400 hover:text-white hover:bg-slate-800/60"
+          className="w-full justify-start text-white/50 hover:text-white hover:bg-white/10"
         >
           <LogOut className="h-4 w-4 mr-2" />
           Logout

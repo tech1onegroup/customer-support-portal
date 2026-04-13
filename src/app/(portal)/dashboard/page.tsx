@@ -37,80 +37,80 @@ const quickLinks = [
     label: "Payments",
     description: "View schedule & receipts",
     icon: CreditCard,
-    gradient: "from-blue-500 to-blue-600",
-    bg: "bg-blue-50",
-    text: "text-blue-600",
-    shadow: "shadow-blue-500/10",
+    gradient: "from-primary to-primary",
+    bg: "bg-primary/10",
+    text: "text-primary",
+    shadow: "shadow-primary/10",
   },
   {
     href: "/construction",
     label: "Construction",
     description: "Track progress & photos",
     icon: Building2,
-    gradient: "from-emerald-500 to-emerald-600",
-    bg: "bg-emerald-50",
-    text: "text-emerald-600",
-    shadow: "shadow-emerald-500/10",
+    gradient: "from-accent to-accent",
+    bg: "bg-accent/10",
+    text: "text-accent",
+    shadow: "shadow-accent/10",
   },
   {
     href: "/documents",
     label: "Documents",
     description: "Download your documents",
     icon: FileText,
-    gradient: "from-violet-500 to-violet-600",
-    bg: "bg-violet-50",
-    text: "text-violet-600",
-    shadow: "shadow-violet-500/10",
+    gradient: "from-primary to-primary",
+    bg: "bg-primary/10",
+    text: "text-primary",
+    shadow: "shadow-primary/10",
   },
   {
     href: "/notifications",
     label: "Notifications",
     description: "View all updates",
     icon: Bell,
-    gradient: "from-amber-500 to-orange-500",
-    bg: "bg-amber-50",
-    text: "text-amber-600",
-    shadow: "shadow-amber-500/10",
+    gradient: "from-accent to-accent",
+    bg: "bg-accent/10",
+    text: "text-accent",
+    shadow: "shadow-accent/10",
   },
   {
     href: "/tickets",
     label: "Tickets",
     description: "Raise a support request",
     icon: MessageSquare,
-    gradient: "from-pink-500 to-rose-500",
-    bg: "bg-pink-50",
-    text: "text-pink-600",
-    shadow: "shadow-pink-500/10",
+    gradient: "from-primary to-primary",
+    bg: "bg-primary/10",
+    text: "text-primary",
+    shadow: "shadow-primary/10",
   },
   {
     href: "/referrals",
     label: "Referrals",
     description: "Refer & earn rewards",
     icon: Gift,
-    gradient: "from-teal-500 to-cyan-500",
-    bg: "bg-teal-50",
-    text: "text-teal-600",
-    shadow: "shadow-teal-500/10",
+    gradient: "from-accent to-accent",
+    bg: "bg-accent/10",
+    text: "text-accent",
+    shadow: "shadow-accent/10",
   },
   {
     href: "/community",
     label: "Community",
     description: "Connect with neighbours",
     icon: Users,
-    gradient: "from-indigo-500 to-blue-500",
-    bg: "bg-indigo-50",
-    text: "text-indigo-600",
-    shadow: "shadow-indigo-500/10",
+    gradient: "from-primary to-primary",
+    bg: "bg-primary/10",
+    text: "text-primary",
+    shadow: "shadow-primary/10",
   },
   {
     href: "/possession",
     label: "Possession",
     description: "Track handover status",
     icon: CalendarDays,
-    gradient: "from-gray-600 to-gray-700",
-    bg: "bg-gray-100",
-    text: "text-gray-600",
-    shadow: "shadow-gray-500/10",
+    gradient: "from-accent to-accent",
+    bg: "bg-accent/10",
+    text: "text-accent",
+    shadow: "shadow-accent/10",
   },
 ];
 
@@ -120,21 +120,21 @@ const recentNotifications = [
     description: "Your next installment is due on 25th April 2026",
     time: "2 hours ago",
     icon: IndianRupee,
-    color: "text-amber-500 bg-amber-50",
+    color: "text-primary bg-primary/10",
   },
   {
     title: "Construction update",
     description: "Plastering work completed for Tower B, Floor 12",
     time: "1 day ago",
     icon: HardHat,
-    color: "text-emerald-500 bg-emerald-50",
+    color: "text-accent bg-accent/10",
   },
   {
     title: "Document uploaded",
     description: "Agreement draft is now available for download",
     time: "3 days ago",
     icon: FileText,
-    color: "text-blue-500 bg-blue-50",
+    color: "text-primary bg-primary/10",
   },
 ];
 
@@ -192,7 +192,7 @@ export default function DashboardPage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-gray-900">
             Welcome back,{" "}
-            <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               {user?.customer?.name || user?.name || "Customer"}
             </span>
           </h1>
@@ -200,7 +200,7 @@ export default function DashboardPage() {
         </div>
         <Link
           href="/payments"
-          className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-md shadow-blue-500/20 transition-all duration-200 hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/30 sm:mt-0"
+          className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-md shadow-primary/20 transition-all duration-200 hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/30 sm:mt-0"
         >
           <IndianRupee className="h-4 w-4" />
           Make Payment
@@ -209,93 +209,93 @@ export default function DashboardPage() {
 
       {/* Stat cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-emerald-50 to-green-50 shadow-sm">
+        <Card className="relative overflow-hidden border-0 bg-muted shadow-sm">
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-emerald-600/70">
+                <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   Total Paid
                 </p>
-                <p className="mt-2 text-2xl font-bold text-emerald-700">
+                <p className="mt-2 text-2xl font-bold text-primary">
                   {formatINR(totalPaid)}
                 </p>
-                <p className="mt-1 text-xs text-emerald-600/60">
+                <p className="mt-1 text-xs text-muted-foreground">
                   {paidPercent}% of total value
                 </p>
               </div>
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-500/10">
-                <TrendingUp className="h-5 w-5 text-emerald-600" />
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10">
+                <TrendingUp className="h-5 w-5 text-primary" />
               </div>
             </div>
-            <div className="absolute -bottom-4 -right-4 h-24 w-24 rounded-full bg-emerald-500/5" />
+            <div className="absolute -bottom-4 -right-4 h-24 w-24 rounded-full bg-primary/5" />
           </CardContent>
         </Card>
 
-        <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-red-50 to-rose-50 shadow-sm">
+        <Card className="relative overflow-hidden border-0 bg-muted shadow-sm">
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-red-600/70">
+                <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   Outstanding
                 </p>
-                <p className="mt-2 text-2xl font-bold text-red-700">
+                <p className="mt-2 text-2xl font-bold text-primary">
                   {formatINR(totalDue)}
                 </p>
-                <p className="mt-1 text-xs text-red-600/60">
+                <p className="mt-1 text-xs text-muted-foreground">
                   {100 - paidPercent}% remaining
                 </p>
               </div>
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-red-500/10">
-                <IndianRupee className="h-5 w-5 text-red-600" />
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent/10">
+                <IndianRupee className="h-5 w-5 text-accent" />
               </div>
             </div>
-            <div className="absolute -bottom-4 -right-4 h-24 w-24 rounded-full bg-red-500/5" />
+            <div className="absolute -bottom-4 -right-4 h-24 w-24 rounded-full bg-accent/5" />
           </CardContent>
         </Card>
 
-        <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-amber-50 to-yellow-50 shadow-sm">
+        <Card className="relative overflow-hidden border-0 bg-muted shadow-sm">
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-amber-600/70">
+                <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   Next Due
                 </p>
-                <p className="mt-2 text-2xl font-bold text-amber-700">
+                <p className="mt-2 text-2xl font-bold text-primary">
                   {stats?.nextDueDate
                     ? new Date(stats.nextDueDate).toLocaleDateString("en-IN", { day: "2-digit", month: "short" })
                     : "All Paid"}
                 </p>
-                <p className="mt-1 text-xs text-amber-600/60">
+                <p className="mt-1 text-xs text-muted-foreground">
                   {stats?.nextDueAmount ? formatINR(Number(stats.nextDueAmount)) + " due" : "No pending dues"}
                 </p>
               </div>
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-500/10">
-                <CalendarClock className="h-5 w-5 text-amber-600" />
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent/10">
+                <CalendarClock className="h-5 w-5 text-accent" />
               </div>
             </div>
-            <div className="absolute -bottom-4 -right-4 h-24 w-24 rounded-full bg-amber-500/5" />
+            <div className="absolute -bottom-4 -right-4 h-24 w-24 rounded-full bg-accent/5" />
           </CardContent>
         </Card>
 
-        <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-blue-50 to-sky-50 shadow-sm">
+        <Card className="relative overflow-hidden border-0 bg-muted shadow-sm">
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-blue-600/70">
+                <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   Construction
                 </p>
-                <p className="mt-2 text-2xl font-bold text-blue-700">
+                <p className="mt-2 text-2xl font-bold text-primary">
                   {paidPercent > 0 ? `${Math.min(paidPercent + 10, 100)}%` : "--"}
                 </p>
-                <p className="mt-1 text-xs text-blue-600/60">
+                <p className="mt-1 text-xs text-muted-foreground">
                   In progress
                 </p>
               </div>
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-500/10">
-                <HardHat className="h-5 w-5 text-blue-600" />
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10">
+                <HardHat className="h-5 w-5 text-primary" />
               </div>
             </div>
-            <div className="absolute -bottom-4 -right-4 h-24 w-24 rounded-full bg-blue-500/5" />
+            <div className="absolute -bottom-4 -right-4 h-24 w-24 rounded-full bg-primary/5" />
           </CardContent>
         </Card>
       </div>
@@ -315,14 +315,14 @@ export default function DashboardPage() {
             {bookings.map((booking) => (
               <Card
                 key={booking.id}
-                className="group relative overflow-hidden border border-gray-100 shadow-sm transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/5 hover:-translate-y-0.5"
+                className="group relative overflow-hidden border border-gray-100 shadow-sm transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-0.5"
               >
                 {/* Top gradient bar */}
-                <div className="h-1.5 w-full bg-gradient-to-r from-blue-500 via-indigo-500 to-violet-500" />
+                <div className="h-1.5 w-full bg-gradient-to-r from-primary via-accent to-primary" />
 
                 <CardHeader className="pb-2 pt-4">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-xs font-semibold uppercase tracking-wider text-blue-600">
+                    <CardTitle className="text-xs font-semibold uppercase tracking-wider text-primary">
                       {booking.projectName}
                     </CardTitle>
                     <Badge variant="outline" className="text-[10px] font-medium">
@@ -380,14 +380,14 @@ export default function DashboardPage() {
                     <link.icon className={`h-5 w-5 ${link.text}`} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <h3 className="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors duration-200">
+                    <h3 className="text-sm font-semibold text-gray-900 group-hover:text-primary transition-colors duration-200">
                       {link.label}
                     </h3>
                     <p className="mt-0.5 text-xs text-gray-500 leading-relaxed">
                       {link.description}
                     </p>
                   </div>
-                  <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-gray-300 transition-all duration-200 group-hover:text-blue-500 group-hover:translate-x-0.5" />
+                  <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-gray-300 transition-all duration-200 group-hover:text-primary group-hover:translate-x-0.5" />
                 </CardContent>
               </Card>
             </Link>
@@ -403,7 +403,7 @@ export default function DashboardPage() {
           </h2>
           <Link
             href="/notifications"
-            className="text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors"
+            className="text-xs font-medium text-primary hover:text-primary/80 transition-colors"
           >
             View all
           </Link>

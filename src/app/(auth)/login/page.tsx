@@ -141,12 +141,12 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left Panel — Brand */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-primary">
         {/* Decorative elements */}
         <div className="absolute inset-0">
-          <div className="absolute top-20 left-20 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 right-20 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-cyan-500/5 rounded-full blur-2xl" />
+          <div className="absolute top-20 left-20 w-72 h-72 bg-accent/20 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 right-20 w-96 h-96 bg-accent/15 rounded-full blur-3xl" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary-foreground/5 rounded-full blur-2xl" />
           {/* Grid pattern */}
           <div
             className="absolute inset-0 opacity-[0.03]"
@@ -161,13 +161,13 @@ export default function LoginPage() {
           {/* Logo */}
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/10">
-              <Building2 className="h-5 w-5 text-white" />
+              <Building2 className="h-5 w-5 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white tracking-tight">
+              <h1 className="text-xl font-bold text-primary-foreground tracking-tight">
                 ONE Group
               </h1>
-              <p className="text-[11px] text-white/40 tracking-widest uppercase">
+              <p className="text-[11px] text-primary-foreground/40 tracking-widest uppercase">
                 Real Estate
               </p>
             </div>
@@ -175,14 +175,14 @@ export default function LoginPage() {
 
           {/* Hero text */}
           <div className="space-y-6 max-w-md">
-            <h2 className="text-4xl font-bold text-white leading-tight">
+            <h2 className="text-4xl font-bold text-primary-foreground leading-tight">
               Your Property,
               <br />
-              <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-accent to-primary-foreground bg-clip-text text-transparent">
                 One Portal Away
               </span>
             </h2>
-            <p className="text-white/50 text-lg leading-relaxed">
+            <p className="text-primary-foreground/50 text-lg leading-relaxed">
               Track payments, monitor construction progress, manage documents —
               everything about your property in one place.
             </p>
@@ -197,33 +197,33 @@ export default function LoginPage() {
               ].map((f) => (
                 <div
                   key={f.label}
-                  className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/5"
+                  className="flex items-center gap-3 p-3 rounded-lg bg-primary-foreground/10 border border-primary-foreground/10"
                 >
                   <span className="text-xl">{f.icon}</span>
-                  <span className="text-sm text-white/70">{f.label}</span>
+                  <span className="text-sm text-primary-foreground/70">{f.label}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Footer */}
-          <p className="text-white/20 text-sm">
+          <p className="text-primary-foreground/20 text-sm">
             &copy; {new Date().getFullYear()} ONE Group. All rights reserved.
           </p>
         </div>
       </div>
 
       {/* Right Panel — Form */}
-      <div className="flex-1 flex items-center justify-center bg-gray-50 px-6 py-12">
+      <div className="flex-1 flex items-center justify-center bg-background px-6 py-12">
         <div className="w-full max-w-md">
           {/* Mobile logo */}
           <div className="flex items-center gap-3 mb-10 lg:hidden">
-            <div className="h-10 w-10 rounded-xl bg-gray-900 flex items-center justify-center">
-              <Building2 className="h-5 w-5 text-white" />
+            <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center">
+              <Building2 className="h-5 w-5 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">ONE Group</h1>
-              <p className="text-[11px] text-gray-400 tracking-widest uppercase">
+              <h1 className="text-xl font-bold text-foreground">ONE Group</h1>
+              <p className="text-[11px] text-muted-foreground tracking-widest uppercase">
                 Customer Portal
               </p>
             </div>
@@ -233,10 +233,10 @@ export default function LoginPage() {
           {step === "phone" && (
             <div className="space-y-8 animate-in fade-in duration-300">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">
+                <h2 className="text-2xl font-bold text-foreground">
                   Welcome back
                 </h2>
-                <p className="text-gray-500 mt-2">
+                <p className="text-muted-foreground mt-2">
                   Enter your registered phone number to continue
                 </p>
               </div>
@@ -245,13 +245,13 @@ export default function LoginPage() {
                 <div className="space-y-2">
                   <Label
                     htmlFor="phone"
-                    className="text-sm font-medium text-gray-700"
+                    className="text-sm font-medium text-foreground"
                   >
                     Phone Number
                   </Label>
                   <div className="relative">
-                    <div className="absolute left-0 top-0 bottom-0 flex items-center pl-4 pr-3 border-r bg-gray-50 rounded-l-lg text-sm text-gray-500 font-medium">
-                      <Phone className="h-4 w-4 mr-2 text-gray-400" />
+                    <div className="absolute left-0 top-0 bottom-0 flex items-center pl-4 pr-3 border-r bg-muted rounded-l-lg text-sm text-muted-foreground font-medium">
+                      <Phone className="h-4 w-4 mr-2 text-muted-foreground" />
                       +91
                     </div>
                     <Input
@@ -283,7 +283,7 @@ export default function LoginPage() {
 
                 <Button
                   type="submit"
-                  className="w-full h-12 text-base font-semibold bg-gray-900 hover:bg-gray-800"
+                  className="w-full h-12 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground"
                   disabled={loading || phone.length !== 10}
                 >
                   {loading ? (
@@ -300,10 +300,10 @@ export default function LoginPage() {
               {/* Divider */}
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-200" />
+                  <div className="w-full border-t border-border" />
                 </div>
                 <div className="relative flex justify-center text-xs">
-                  <span className="bg-gray-50 px-4 text-gray-400 uppercase tracking-wider">
+                  <span className="bg-background px-4 text-muted-foreground uppercase tracking-wider">
                     Admin Access
                   </span>
                 </div>
@@ -314,7 +314,7 @@ export default function LoginPage() {
                   setStep("register");
                   setError("");
                 }}
-                className="w-full flex items-center justify-center gap-2 h-11 rounded-lg border-2 border-dashed border-gray-200 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700 hover:bg-white transition-all"
+                className="w-full flex items-center justify-center gap-2 h-11 rounded-lg border-2 border-dashed border-border text-sm font-medium text-muted-foreground hover:border-primary/30 hover:text-foreground hover:bg-card transition-all"
               >
                 <Shield className="h-4 w-4" />
                 Register as Admin
@@ -332,17 +332,17 @@ export default function LoginPage() {
                     setOtp(["", "", "", "", "", ""]);
                     setError("");
                   }}
-                  className="flex items-center gap-1 text-sm text-gray-400 hover:text-gray-600 mb-6 -ml-1"
+                  className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 -ml-1"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   Back
                 </button>
-                <h2 className="text-2xl font-bold text-gray-900">
+                <h2 className="text-2xl font-bold text-foreground">
                   Verify OTP
                 </h2>
-                <p className="text-gray-500 mt-2">
+                <p className="text-muted-foreground mt-2">
                   We sent a 6-digit code to{" "}
-                  <span className="font-semibold text-gray-700">
+                  <span className="font-semibold text-foreground">
                     +91 {phone}
                   </span>
                 </p>
@@ -362,7 +362,7 @@ export default function LoginPage() {
                       value={digit}
                       onChange={(e) => handleOtpChange(i, e.target.value)}
                       onKeyDown={(e) => handleKeyDown(i, e)}
-                      className="w-13 h-14 rounded-xl border-2 border-gray-200 text-center text-2xl font-bold text-gray-900 focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 outline-none transition-all bg-white"
+                      className="w-13 h-14 rounded-xl border-2 border-border text-center text-2xl font-bold text-foreground focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all bg-card"
                     />
                   ))}
                 </div>
@@ -378,7 +378,7 @@ export default function LoginPage() {
 
                 <Button
                   type="submit"
-                  className="w-full h-12 text-base font-semibold bg-gray-900 hover:bg-gray-800"
+                  className="w-full h-12 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground"
                   disabled={loading || otp.join("").length !== 6}
                 >
                   {loading ? (
@@ -392,9 +392,9 @@ export default function LoginPage() {
                 </Button>
 
                 <div className="text-center">
-                  <p className="text-xs text-gray-300 bg-gray-100 inline-block px-3 py-1.5 rounded-full">
+                  <p className="text-xs text-muted-foreground bg-muted inline-block px-3 py-1.5 rounded-full">
                     Dev OTP:{" "}
-                    <span className="font-mono font-bold text-gray-500">
+                    <span className="font-mono font-bold text-foreground">
                       123456
                     </span>
                   </p>
@@ -413,22 +413,22 @@ export default function LoginPage() {
                     setError("");
                     setSuccess("");
                   }}
-                  className="flex items-center gap-1 text-sm text-gray-400 hover:text-gray-600 mb-6 -ml-1"
+                  className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 -ml-1"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   Back to Login
                 </button>
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="h-10 w-10 rounded-xl bg-indigo-50 flex items-center justify-center">
-                    <Shield className="h-5 w-5 text-indigo-600" />
+                  <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <Shield className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-900">
+                    <h2 className="text-2xl font-bold text-foreground">
                       Admin Registration
                     </h2>
                   </div>
                 </div>
-                <p className="text-gray-500 mt-1">
+                <p className="text-muted-foreground mt-1">
                   Register a new admin account with your organization code
                 </p>
               </div>
@@ -444,11 +444,11 @@ export default function LoginPage() {
 
               <form onSubmit={handleRegister} className="space-y-4">
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">
+                  <Label className="text-sm font-medium text-foreground">
                     Full Name
                   </Label>
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                       placeholder="Your full name"
                       value={regName}
@@ -460,11 +460,11 @@ export default function LoginPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">
+                  <Label className="text-sm font-medium text-foreground">
                     Phone Number
                   </Label>
                   <div className="relative">
-                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                       type="tel"
                       placeholder="9876543210"
@@ -481,14 +481,14 @@ export default function LoginPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">
+                  <Label className="text-sm font-medium text-foreground">
                     Email{" "}
-                    <span className="text-gray-400 font-normal">
+                    <span className="text-muted-foreground font-normal">
                       (optional)
                     </span>
                   </Label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                       type="email"
                       placeholder="admin@onegroup.in"
@@ -500,11 +500,11 @@ export default function LoginPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">
+                  <Label className="text-sm font-medium text-foreground">
                     Admin Registration Code
                   </Label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                       type="password"
                       placeholder="Enter organization code"
@@ -514,7 +514,7 @@ export default function LoginPage() {
                       required
                     />
                   </div>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-muted-foreground">
                     Dev code:{" "}
                     <span className="font-mono font-bold">ONEGROUP2025</span>
                   </p>
@@ -531,7 +531,7 @@ export default function LoginPage() {
 
                 <Button
                   type="submit"
-                  className="w-full h-12 text-base font-semibold bg-indigo-600 hover:bg-indigo-700"
+                  className="w-full h-12 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground"
                   disabled={
                     loading ||
                     !regName ||

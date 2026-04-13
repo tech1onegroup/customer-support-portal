@@ -30,7 +30,7 @@ export default function PortalLayout({
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
       </div>
     );
   }
@@ -38,7 +38,7 @@ export default function PortalLayout({
   if (!user) return null;
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-background">
       {/* Desktop sidebar - always visible */}
       <div className="hidden lg:block">
         <PortalSidebar />
@@ -64,7 +64,7 @@ export default function PortalLayout({
       {/* Main content area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile top bar */}
-        <div className="lg:hidden flex items-center gap-3 px-4 py-3 bg-gray-900 text-white">
+        <div className="lg:hidden flex items-center gap-3 px-4 py-3 bg-primary text-primary-foreground">
           <button
             onClick={() => setSidebarOpen(true)}
             className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-white/10 transition-colors"
@@ -72,8 +72,8 @@ export default function PortalLayout({
             <Menu className="h-5 w-5" />
           </button>
           <div className="flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-blue-500 to-blue-600">
-              <Building2 className="h-4 w-4 text-white" />
+            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-accent">
+              <Building2 className="h-4 w-4 text-accent-foreground" />
             </div>
             <span className="text-sm font-bold tracking-tight">ONE Group</span>
           </div>

@@ -127,7 +127,7 @@ export default function ConstructionPage() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight text-gray-900 flex items-center gap-3">
-          <HardHat className="h-8 w-8 text-amber-500" />
+          <HardHat className="h-8 w-8 text-primary" />
           Construction Progress
         </h1>
         <p className="text-gray-500 mt-1 ml-11">
@@ -142,7 +142,7 @@ export default function ConstructionPage() {
             <span className="text-sm font-semibold text-gray-700">
               Overall Progress
             </span>
-            <Badge className="bg-emerald-50 text-emerald-700 border-0 font-semibold">
+            <Badge className="bg-primary/10 text-primary border-0 font-semibold">
               {Math.round(progressPercent)}% Complete
             </Badge>
           </div>
@@ -153,7 +153,7 @@ export default function ConstructionPage() {
             <div className="absolute top-5 left-0 right-0 h-0.5 bg-gray-200" />
             {/* Active line */}
             <div
-              className="absolute top-5 left-0 h-0.5 bg-gradient-to-r from-emerald-500 to-emerald-400 transition-all duration-700"
+              className="absolute top-5 left-0 h-0.5 bg-gradient-to-r from-primary to-primary/80 transition-all duration-700"
               style={{
                 width: `${(stageIndex / (stages.length - 1)) * 100}%`,
               }}
@@ -177,9 +177,9 @@ export default function ConstructionPage() {
                         relative z-10 flex items-center justify-center rounded-full transition-all duration-300
                         ${
                           isCompleted
-                            ? "h-10 w-10 bg-emerald-500 text-white shadow-md shadow-emerald-200"
+                            ? "h-10 w-10 bg-primary text-primary-foreground shadow-md shadow-primary/20"
                             : isCurrent
-                            ? "h-10 w-10 bg-white border-[3px] border-emerald-500 text-emerald-600 shadow-lg shadow-emerald-100 ring-4 ring-emerald-50"
+                            ? "h-10 w-10 bg-white border-[3px] border-primary text-primary shadow-lg shadow-primary/10 ring-4 ring-primary/5"
                             : "h-10 w-10 bg-gray-100 text-gray-400 border-2 border-gray-200"
                         }
                       `}
@@ -199,9 +199,9 @@ export default function ConstructionPage() {
                         mt-3 text-[11px] font-medium text-center leading-tight max-w-[80px]
                         ${
                           isCompleted
-                            ? "text-emerald-600"
+                            ? "text-primary"
                             : isCurrent
-                            ? "text-emerald-700 font-semibold"
+                            ? "text-primary font-semibold"
                             : "text-gray-400"
                         }
                       `}

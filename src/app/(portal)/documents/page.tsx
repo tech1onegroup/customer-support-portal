@@ -175,7 +175,7 @@ export default function DocumentsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-gray-900 flex items-center gap-3">
-            <FolderOpen className="h-8 w-8 text-violet-500" />
+            <FolderOpen className="h-8 w-8 text-primary" />
             Document Vault
           </h1>
           <p className="text-gray-500 mt-1 ml-11">
@@ -183,7 +183,7 @@ export default function DocumentsPage() {
           </p>
         </div>
         <Button
-          className="bg-violet-600 hover:bg-violet-700 shadow-sm gap-2"
+          className="bg-primary hover:bg-primary/90 shadow-sm gap-2"
           disabled={uploading}
           onClick={() => document.getElementById("doc-drop-input")?.click()}
         >
@@ -199,7 +199,7 @@ export default function DocumentsPage() {
             label: "Total Documents",
             count: documents.length,
             icon: FileText,
-            gradient: "from-violet-500 to-violet-700",
+            gradient: "from-primary to-primary/90",
           },
           {
             label: "Company Documents",
@@ -207,14 +207,14 @@ export default function DocumentsPage() {
               (d) => d.uploadedBy === "ADMIN" || d.uploadedBy === "SYSTEM"
             ).length,
             icon: FolderOpen,
-            gradient: "from-blue-500 to-blue-700",
+            gradient: "from-accent to-accent/90",
           },
           {
             label: "Your Uploads",
             count: documents.filter((d) => d.uploadedBy === "CUSTOMER")
               .length,
             icon: Upload,
-            gradient: "from-emerald-500 to-emerald-700",
+            gradient: "from-primary/80 to-primary",
           },
         ].map((stat) => (
           <Card
@@ -276,7 +276,7 @@ export default function DocumentsPage() {
             onClick={() => setActiveFilter("ALL")}
             className={
               activeFilter === "ALL"
-                ? "bg-violet-600 hover:bg-violet-700"
+                ? "bg-primary hover:bg-primary/90 text-primary-foreground"
                 : "hover:bg-gray-100"
             }
           >
@@ -290,7 +290,7 @@ export default function DocumentsPage() {
               onClick={() => setActiveFilter(type)}
               className={
                 activeFilter === type
-                  ? "bg-violet-600 hover:bg-violet-700"
+                  ? "bg-primary hover:bg-primary/90 text-primary-foreground"
                   : "hover:bg-gray-100"
               }
             >
@@ -329,8 +329,8 @@ export default function DocumentsPage() {
                 <CardContent className="p-5">
                   <div className="flex items-start gap-4">
                     {/* File type icon */}
-                    <div className="h-12 w-12 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0 group-hover:bg-violet-50 transition-colors">
-                      <FileIcon className="h-6 w-6 text-gray-500 group-hover:text-violet-600 transition-colors" />
+                    <div className="h-12 w-12 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/10 transition-colors">
+                      <FileIcon className="h-6 w-6 text-gray-500 group-hover:text-primary transition-colors" />
                     </div>
 
                     <div className="flex-1 min-w-0">
@@ -366,7 +366,7 @@ export default function DocumentsPage() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-8 w-8 p-0 text-gray-400 hover:text-violet-600 hover:bg-violet-50"
+                            className="h-8 w-8 p-0 text-gray-400 hover:text-primary hover:bg-primary/10"
                             onClick={() =>
                               window.open(doc.fileUrl, "_blank")
                             }
@@ -376,7 +376,7 @@ export default function DocumentsPage() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-8 w-8 p-0 text-gray-400 hover:text-violet-600 hover:bg-violet-50"
+                            className="h-8 w-8 p-0 text-gray-400 hover:text-primary hover:bg-primary/10"
                             onClick={() => {
                               const a = document.createElement("a");
                               a.href = doc.fileUrl;
