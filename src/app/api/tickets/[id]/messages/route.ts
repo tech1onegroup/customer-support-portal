@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { authenticateRequest } from "@/lib/api-auth";
 import { sanitizeInput } from "@/lib/sanitize";
+import {
+  collectAttachmentFiles,
+  uploadAttachments,
+} from "@/lib/ticket-attachments";
+import { emitTicketEvent } from "@/lib/events";
 
 export async function POST(
   request: Request,
@@ -18,7 +23,6 @@ export async function POST(
     return NextResponse.json({ error: "Customer not found" }, { status: 404 });
   }
 
-  // Verify ticket belongs to customer
   const ticket = await prisma.ticket.findFirst({
     where: { id, customerId: customer.id },
   });
@@ -33,17 +37,32 @@ export async function POST(
     );
   }
 
-  const body = await request.json();
-  const { message } = body;
+  let message = "";
+  let files: File[] = [];
 
-  if (!message || !message.trim()) {
+  const contentType = request.headers.get("content-type") || "";
+  if (contentType.includes("multipart/form-data")) {
+    const form = await request.formData();
+    message = (form.get("message") as string) || "";
+    files = collectAttachmentFiles(form);
+  } else {
+    const body = await request.json();
+    message = body.message || "";
+  }
+
+  if (!message.trim() && files.length === 0) {
     return NextResponse.json(
-      { error: "Message is required" },
+      { error: "Message or attachment is required" },
       { status: 400 }
     );
   }
 
-  const sanitizedMessage = sanitizeInput(message);
+  const uploadResult = await uploadAttachments(files, `tickets/${id}`);
+  if ("error" in uploadResult) {
+    return NextResponse.json({ error: uploadResult.error }, { status: 400 });
+  }
+
+  const sanitizedMessage = message.trim() ? sanitizeInput(message) : "";
 
   const ticketMessage = await prisma.ticketMessage.create({
     data: {
@@ -51,19 +70,46 @@ export async function POST(
       senderId: customer.id,
       message: sanitizedMessage,
       isInternal: false,
+      attachments: {
+        create: uploadResult.map((a) => ({
+          url: a.url,
+          name: a.name,
+          type: a.type,
+          size: a.size,
+        })),
+      },
     },
+    include: { attachments: true },
   });
 
-  // Update ticket updatedAt
   await prisma.ticket.update({
     where: { id },
     data: { updatedAt: new Date() },
   });
 
-  return NextResponse.json({
+  const customerMessage = {
     id: ticketMessage.id,
+    senderId: ticketMessage.senderId,
     message: ticketMessage.message,
+    attachments: ticketMessage.attachments.map((a) => ({
+      id: a.id,
+      url: a.url,
+      name: a.name,
+      type: a.type,
+      size: a.size,
+    })),
     createdAt: ticketMessage.createdAt.toISOString(),
     isCustomer: true,
-  }, { status: 201 });
+    isAdmin: false,
+    isInternal: false,
+  };
+
+  emitTicketEvent({
+    type: "message",
+    ticketId: id,
+    message: customerMessage,
+    isCustomer: true,
+  });
+
+  return NextResponse.json(customerMessage, { status: 201 });
 }

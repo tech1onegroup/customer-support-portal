@@ -4,14 +4,14 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 // ─── AUTHENTICATION ─────────────────────────────────
 
 model User {
   id          String    @id @default(cuid())
-  phone       String    @unique
+  phone       String?   @unique
   email       String?
   role        String    @default("CUSTOMER") // CUSTOMER, ADMIN, SUPER_ADMIN
   isActive    Boolean   @default(true)
@@ -103,7 +103,7 @@ model Customer {
   title         String?
   name          String
   email         String?
-  phone         String
+  phone         String?
   altPhone      String?
   address       String?
   city          String?
@@ -282,13 +282,30 @@ model Ticket {
 }
 
 model TicketMessage {
-  id         String   @id @default(cuid())
-  ticketId   String
-  ticket     Ticket   @relation(fields: [ticketId], references: [id])
-  senderId   String
-  message    String
-  isInternal Boolean  @default(false)
-  createdAt  DateTime @default(now())
+  id             String   @id @default(cuid())
+  ticketId       String
+  ticket         Ticket   @relation(fields: [ticketId], references: [id])
+  senderId       String
+  message        String
+  isInternal     Boolean  @default(false)
+  attachmentUrl  String?
+  attachmentName String?
+  attachmentType String?
+  attachmentSize Int?
+  createdAt      DateTime @default(now())
+
+  attachments TicketAttachment[]
+}
+
+model TicketAttachment {
+  id        String        @id @default(cuid())
+  messageId String
+  message   TicketMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  url       String
+  name      String
+  type      String
+  size      Int
+  createdAt DateTime      @default(now())
 }
 
 // ─── NOTIFICATIONS ──────────────────────────────────

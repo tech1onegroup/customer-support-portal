@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { isTicketsOnly } from "@/lib/features";
 import { useAuth } from "@/hooks/use-auth";
+import { useNotifications } from "@/contexts/notification-context";
 import {
   LayoutDashboard,
   CreditCard,
@@ -60,9 +62,23 @@ function getInitials(name: string | null | undefined): string {
     .toUpperCase();
 }
 
+const TICKETS_ONLY_HREFS = new Set(["/tickets", "/notifications", "/profile"]);
+
 export function PortalSidebar() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
+  const { unreadCount } = useNotifications();
+
+  const visibleSections = isTicketsOnly()
+    ? navSections
+        .map((section) => ({
+          ...section,
+          items: section.items.filter((item) =>
+            TICKETS_ONLY_HREFS.has(item.href)
+          ),
+        }))
+        .filter((section) => section.items.length > 0)
+    : navSections;
 
   return (
     <aside className="flex flex-col w-64 h-screen sticky top-0 bg-sidebar text-sidebar-foreground overflow-y-auto">
@@ -88,7 +104,7 @@ export function PortalSidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-5">
-        {navSections.map((section) => (
+        {visibleSections.map((section) => (
           <div key={section.title}>
             <p className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
               {section.title}
@@ -126,10 +142,20 @@ export function PortalSidebar() {
                     <span className="flex-1">{item.label}</span>
 
                     {/* Notification badge */}
-                    {"badge" in item && item.badge && (
+                    {"badge" in item && item.badge && unreadCount !== null && (
                       <span className="relative flex h-2 w-2">
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
-                        <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500" />
+                        <span
+                          className={cn(
+                            "absolute inline-flex h-full w-full animate-ping rounded-full opacity-75",
+                            unreadCount > 0 ? "bg-red-400" : "bg-green-400"
+                          )}
+                        />
+                        <span
+                          className={cn(
+                            "relative inline-flex h-2 w-2 rounded-full",
+                            unreadCount > 0 ? "bg-red-500" : "bg-green-500"
+                          )}
+                        />
                       </span>
                     )}
 

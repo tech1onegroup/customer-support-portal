@@ -7,7 +7,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Send, User, Headphones } from "lucide-react";
+import { ArrowLeft, Send, User, Headphones, FileText, Download } from "lucide-react";
+import {
+  AttachmentPicker,
+  appendAttachmentsToFormData,
+  filesFromClipboard,
+} from "@/components/shared/attachment-picker";
 
 interface TicketDetail {
   id: string;
@@ -23,10 +28,19 @@ interface TicketDetail {
   messages: TicketMessage[];
 }
 
+interface TicketAttachment {
+  id: string;
+  url: string;
+  name: string;
+  type: string;
+  size: number;
+}
+
 interface TicketMessage {
   id: string;
   senderId: string;
   message: string;
+  attachments: TicketAttachment[];
   createdAt: string;
   isCustomer: boolean;
 }
@@ -44,6 +58,94 @@ const priorityConfig: Record<string, { label: string; variant: "default" | "seco
   HIGH: { label: "High", variant: "default" },
   URGENT: { label: "Urgent", variant: "destructive" },
 };
+
+function MessageAttachment({
+  url,
+  name,
+  type,
+  size,
+  invert,
+}: {
+  url: string;
+  name: string;
+  type: string | null;
+  size: number | null;
+  invert: boolean;
+}) {
+  const isImage = (type || "").startsWith("image/");
+  const sizeKb = size ? `${(size / 1024).toFixed(0)} KB` : "";
+  const downloadHref = buildDownloadHref(url, name);
+  if (isImage) {
+    return (
+      <div className="mt-2 space-y-1">
+        <a href={url} target="_blank" rel="noopener noreferrer" className="block">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={url}
+            alt={name}
+            className="max-h-64 rounded-md border border-white/10"
+          />
+        </a>
+        <a
+          href={downloadHref}
+          download={name}
+          className={`inline-flex items-center gap-1 text-xs underline ${
+            invert ? "text-gray-200" : "text-gray-600"
+          }`}
+        >
+          <Download className="h-3 w-3" />
+          Download
+        </a>
+      </div>
+    );
+  }
+  return (
+    <div
+      className={`mt-2 flex items-center gap-2 rounded-md border px-3 py-2 text-sm ${
+        invert
+          ? "border-white/20 bg-white/10 text-white"
+          : "border-gray-200 bg-white text-gray-900"
+      }`}
+    >
+      <FileText className="h-4 w-4 flex-shrink-0" />
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex-1 truncate hover:underline"
+        title="Open"
+      >
+        {name}
+      </a>
+      {sizeKb && (
+        <span className={invert ? "text-gray-300 text-xs" : "text-gray-500 text-xs"}>
+          {sizeKb}
+        </span>
+      )}
+      <a
+        href={downloadHref}
+        download={name}
+        className={`flex-shrink-0 rounded p-1 ${
+          invert
+            ? "hover:bg-white/20 text-gray-200"
+            : "hover:bg-gray-100 text-gray-600"
+        }`}
+        title="Download"
+      >
+        <Download className="h-4 w-4" />
+      </a>
+    </div>
+  );
+}
+
+function buildDownloadHref(url: string, name: string): string {
+  // Force attachment download via ?download=1 for our own /api/files/ URLs.
+  // External (e.g. S3 presigned) URLs fall through unchanged — the <a download>
+  // attribute handles the hint on same-origin links, ignored cross-origin.
+  if (!url.startsWith("/api/files/")) return url;
+  const sep = url.includes("?") ? "&" : "?";
+  return `${url}${sep}download=1&name=${encodeURIComponent(name)}`;
+}
 
 const categoryLabels: Record<string, string> = {
   PAYMENT_DISPUTE: "Payment Dispute",
@@ -66,14 +168,64 @@ export default function TicketDetailPage({
   const [loading, setLoading] = useState(true);
   const [reply, setReply] = useState("");
   const [sending, setSending] = useState(false);
+  const [attachments, setAttachments] = useState<File[]>([]);
+  const [replyError, setReplyError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!accessToken || !id) return;
     fetchTicket();
+
+    // Live updates via Server-Sent Events. Fallback to polling if stream errors.
+    let pollTimer: ReturnType<typeof setInterval> | null = null;
+    const es = new EventSource(
+      `/api/tickets/${id}/stream?token=${encodeURIComponent(accessToken)}`
+    );
+    es.onmessage = (e) => {
+      try {
+        const event = JSON.parse(e.data);
+        if (event.type === "message") {
+          setTicket((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  messages: prev.messages.some((m) => m.id === event.message.id)
+                    ? prev.messages
+                    : [...prev.messages, event.message],
+                  updatedAt: new Date().toISOString(),
+                }
+              : prev
+          );
+        } else if (event.type === "ticket_changed") {
+          fetchTicket({ silent: true });
+        }
+      } catch {
+        // ignore malformed frames
+      }
+    };
+    es.onerror = () => {
+      // Network/proxy hiccup — fall back to polling until the stream reconnects.
+      if (!pollTimer) {
+        pollTimer = setInterval(() => {
+          if (document.visibilityState === "visible") {
+            fetchTicket({ silent: true });
+          }
+        }, 5000);
+      }
+    };
+    es.addEventListener("ready", () => {
+      if (pollTimer) {
+        clearInterval(pollTimer);
+        pollTimer = null;
+      }
+    });
+    return () => {
+      es.close();
+      if (pollTimer) clearInterval(pollTimer);
+    };
   }, [accessToken, id]);
 
-  async function fetchTicket() {
-    setLoading(true);
+  async function fetchTicket(opts: { silent?: boolean } = {}) {
+    if (!opts.silent) setLoading(true);
     try {
       const res = await fetch(`/api/tickets/${id}`, {
         headers: { Authorization: `Bearer ${accessToken}` },
@@ -84,21 +236,22 @@ export default function TicketDetailPage({
     } catch (err) {
       console.error("Failed to load ticket:", err);
     } finally {
-      setLoading(false);
+      if (!opts.silent) setLoading(false);
     }
   }
 
   async function handleSendReply() {
-    if (!reply.trim() || !accessToken) return;
+    if ((!reply.trim() && attachments.length === 0) || !accessToken) return;
     setSending(true);
+    setReplyError(null);
     try {
+      const fd = new FormData();
+      fd.append("message", reply);
+      appendAttachmentsToFormData(fd, attachments);
       const res = await fetch(`/api/tickets/${id}/messages`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({ message: reply }),
+        headers: { Authorization: `Bearer ${accessToken}` },
+        body: fd,
       });
       if (res.ok) {
         const newMsg = await res.json();
@@ -106,9 +259,14 @@ export default function TicketDetailPage({
           prev ? { ...prev, messages: [...prev.messages, newMsg] } : prev
         );
         setReply("");
+        setAttachments([]);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setReplyError(data.error || "Failed to send reply");
       }
     } catch (err) {
       console.error("Failed to send reply:", err);
+      setReplyError("Failed to send reply");
     } finally {
       setSending(false);
     }
@@ -151,7 +309,6 @@ export default function TicketDetailPage({
   }
 
   const sc = statusConfig[ticket.status];
-  const pc = priorityConfig[ticket.priority];
   const isClosed = ticket.status === "CLOSED";
 
   return (
@@ -171,7 +328,7 @@ export default function TicketDetailPage({
       </div>
 
       {/* Ticket Info */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-3">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-gray-500">Status</CardTitle>
@@ -179,16 +336,6 @@ export default function TicketDetailPage({
           <CardContent>
             <Badge variant={sc?.variant || "secondary"}>
               {sc?.label || ticket.status}
-            </Badge>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">Priority</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Badge variant={pc?.variant || "secondary"}>
-              {pc?.label || ticket.priority}
             </Badge>
           </CardContent>
         </Card>
@@ -236,7 +383,19 @@ export default function TicketDetailPage({
                       : "bg-gray-100 text-gray-900"
                   }`}
                 >
-                  <p className="text-sm whitespace-pre-wrap">{msg.message}</p>
+                  {msg.message && (
+                    <p className="text-sm whitespace-pre-wrap">{msg.message}</p>
+                  )}
+                  {msg.attachments.map((a) => (
+                    <MessageAttachment
+                      key={a.id}
+                      url={a.url}
+                      name={a.name}
+                      type={a.type}
+                      size={a.size}
+                      invert={msg.isCustomer}
+                    />
+                  ))}
                   <p
                     className={`text-xs mt-1 ${
                       msg.isCustomer ? "text-gray-400" : "text-gray-500"
@@ -256,22 +415,52 @@ export default function TicketDetailPage({
 
           {/* Reply Form */}
           {!isClosed && (
-            <div className="mt-6 flex gap-3">
-              <Textarea
-                value={reply}
-                onChange={(e) => setReply(e.target.value)}
-                placeholder="Type your reply..."
-                rows={3}
-                className="flex-1"
+            <div
+              className="mt-6 space-y-3"
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              onDrop={(e) => {
+                const dropped = Array.from(e.dataTransfer.files || []);
+                if (dropped.length === 0) return;
+                e.preventDefault();
+                e.stopPropagation();
+                setAttachments((prev) => [...prev, ...dropped].slice(0, 10));
+              }}
+            >
+              <div className="flex gap-3">
+                <Textarea
+                  value={reply}
+                  onChange={(e) => setReply(e.target.value)}
+                  onPaste={(e) => {
+                    const pasted = filesFromClipboard(e);
+                    if (pasted.length > 0) {
+                      e.preventDefault();
+                      setAttachments((prev) => [...prev, ...pasted].slice(0, 10));
+                    }
+                  }}
+                  placeholder="Type your reply... (drag, drop, or paste files)"
+                  rows={3}
+                  className="flex-1"
+                />
+                <Button
+                  onClick={handleSendReply}
+                  disabled={sending || (!reply.trim() && attachments.length === 0)}
+                  className="self-end"
+                >
+                  <Send className="h-4 w-4 mr-2" />
+                  {sending ? "Sending..." : "Send"}
+                </Button>
+              </div>
+              <AttachmentPicker
+                files={attachments}
+                onChange={setAttachments}
+                compact
               />
-              <Button
-                onClick={handleSendReply}
-                disabled={sending || !reply.trim()}
-                className="self-end"
-              >
-                <Send className="h-4 w-4 mr-2" />
-                {sending ? "Sending..." : "Send"}
-              </Button>
+              {replyError && (
+                <p className="text-sm text-red-600">{replyError}</p>
+              )}
             </div>
           )}
 

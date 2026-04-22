@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
+import { isTicketsOnly } from "@/lib/features";
 
 export default function HomePage() {
   const { user, isLoading } = useAuth();
@@ -14,9 +15,9 @@ export default function HomePage() {
     if (!user) {
       router.push("/login");
     } else if (user.role === "ADMIN" || user.role === "SUPER_ADMIN") {
-      router.push("/admin/dashboard");
+      router.push(isTicketsOnly() ? "/admin/tickets" : "/admin/dashboard");
     } else {
-      router.push("/dashboard");
+      router.push(isTicketsOnly() ? "/tickets" : "/dashboard");
     }
   }, [user, isLoading, router]);
 

@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
+import { isTicketsOnly } from "@/lib/features";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -157,7 +159,12 @@ interface PaymentStats {
 
 export default function DashboardPage() {
   const { user, accessToken } = useAuth();
+  const router = useRouter();
   const [stats, setStats] = useState<PaymentStats | null>(null);
+
+  useEffect(() => {
+    if (isTicketsOnly()) router.replace("/tickets");
+  }, [router]);
 
   const bookings = user?.customer?.bookings || [];
   const firstBookingId = bookings[0]?.id || null;

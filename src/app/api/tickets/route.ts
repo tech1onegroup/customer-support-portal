@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { authenticateRequest } from "@/lib/api-auth";
 import { sanitizeInput } from "@/lib/sanitize";
+import {
+  collectAttachmentFiles,
+  uploadAttachments,
+} from "@/lib/ticket-attachments";
+import { emitTicketEvent } from "@/lib/events";
 
 export async function GET(request: Request) {
   const auth = await authenticateRequest(request);
@@ -18,7 +23,6 @@ export async function GET(request: Request) {
     const tickets = await prisma.ticket.findMany({
       where: { customerId: customer.id },
       orderBy: { createdAt: "desc" },
-      take: 50,
     });
 
     return NextResponse.json({
@@ -51,16 +55,51 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Customer not found" }, { status: 404 });
     }
 
-    const body = await request.json();
-    const { category } = body;
-    const subject = body.subject ? sanitizeInput(body.subject) : "";
-    const description = body.description ? sanitizeInput(body.description) : "";
+    let category = "";
+    let subjectRaw = "";
+    let descriptionRaw = "";
+    let priority = "";
+    let files: File[] = [];
 
-    if (!category || !subject || !description) {
+    const contentType = request.headers.get("content-type") || "";
+    if (contentType.includes("multipart/form-data")) {
+      const form = await request.formData();
+      category = (form.get("category") as string) || "";
+      subjectRaw = (form.get("subject") as string) || "";
+      descriptionRaw = (form.get("description") as string) || "";
+      priority = (form.get("priority") as string) || "";
+      files = collectAttachmentFiles(form);
+    } else {
+      const body = await request.json();
+      category = body.category || "";
+      subjectRaw = body.subject || "";
+      descriptionRaw = body.description || "";
+      priority = body.priority || "";
+    }
+
+    const VALID_PRIORITIES = new Set(["LOW", "MEDIUM", "HIGH", "URGENT"]);
+    const finalPriority = VALID_PRIORITIES.has(priority) ? priority : "MEDIUM";
+
+    const subject = subjectRaw ? sanitizeInput(subjectRaw) : "";
+    const description = descriptionRaw ? sanitizeInput(descriptionRaw) : "";
+
+    const hasAttachments = files.length > 0;
+    if (!category && !subject && !description && !hasAttachments) {
       return NextResponse.json(
-        { error: "category, subject, and description are required" },
+        { error: "Add a subject, description, or attachment before submitting" },
         { status: 400 }
       );
+    }
+
+    const finalCategory = category || "GENERAL";
+    const firstFileName = hasAttachments ? files[0].name : null;
+    const finalSubject = subject || firstFileName || "Untitled ticket";
+    const finalDescription =
+      description || (hasAttachments ? "(see attachments)" : "");
+
+    const uploadResult = await uploadAttachments(files, "tickets/new");
+    if ("error" in uploadResult) {
+      return NextResponse.json({ error: uploadResult.error }, { status: 400 });
     }
 
     const today = new Date();
@@ -74,11 +113,11 @@ export async function POST(request: Request) {
       data: {
         ticketRef,
         customerId: customer.id,
-        category,
-        subject,
-        description,
+        category: finalCategory,
+        subject: finalSubject,
+        description: finalDescription,
         status: "OPEN",
-        priority: "MEDIUM",
+        priority: finalPriority,
       },
     });
 
@@ -86,14 +125,24 @@ export async function POST(request: Request) {
       data: {
         ticketId: ticket.id,
         senderId: customer.id,
-        message: description,
+        message: finalDescription,
+        attachments: {
+          create: uploadResult.map((a) => ({
+            url: a.url,
+            name: a.name,
+            type: a.type,
+            size: a.size,
+          })),
+        },
       },
     });
 
-    return NextResponse.json({
-      id: ticket.id,
-      ticketRef: ticket.ticketRef,
-    }, { status: 201 });
+    emitTicketEvent({ type: "ticket_created", ticketId: ticket.id });
+
+    return NextResponse.json(
+      { id: ticket.id, ticketRef: ticket.ticketRef },
+      { status: 201 }
+    );
   } catch (error) {
     console.error("Create ticket error:", error);
     return NextResponse.json({ error: "Failed to create ticket" }, { status: 500 });

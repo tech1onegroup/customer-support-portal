@@ -1,10 +1,11 @@
 "use client";
 
 import { useAuth } from "@/hooks/use-auth";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { AdminSidebar } from "@/components/shared/admin-sidebar";
 import { ErrorBoundary } from "@/components/shared/error-boundary";
+import { isAllowedPath } from "@/lib/features";
 
 export default function AdminLayout({
   children,
@@ -13,6 +14,7 @@ export default function AdminLayout({
 }) {
   const { user, isLoading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (!isLoading) {
@@ -23,6 +25,14 @@ export default function AdminLayout({
       }
     }
   }, [user, isLoading, router]);
+
+  useEffect(() => {
+    if (!user) return;
+    if (user.role !== "ADMIN" && user.role !== "SUPER_ADMIN") return;
+    if (!isAllowedPath("ADMIN", pathname)) {
+      router.replace("/admin/tickets");
+    }
+  }, [user, pathname, router]);
 
   if (isLoading) {
     return (

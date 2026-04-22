@@ -1,19 +1,22 @@
 "use client";
 
 import { useAuth } from "@/hooks/use-auth";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { PortalSidebar } from "@/components/shared/portal-sidebar";
 import { ErrorBoundary } from "@/components/shared/error-boundary";
+import { NotificationProvider } from "@/contexts/notification-context";
 import { Building2, Menu, X } from "lucide-react";
+import { isAllowedPath } from "@/lib/features";
 
 export default function PortalLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { user, isLoading } = useAuth();
+  const { user, accessToken, isLoading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
@@ -22,12 +25,22 @@ export default function PortalLayout({
     }
   }, [user, isLoading, router]);
 
+  useEffect(() => {
+    if (!user) return;
+    if (!isAllowedPath("CUSTOMER", pathname)) {
+      router.replace("/tickets");
+    }
+  }, [user, pathname, router]);
+
   // Close sidebar on route change
   useEffect(() => {
     setSidebarOpen(false);
   }, [children]);
 
-  if (isLoading) {
+  // Show spinner until auth is fully resolved AND accessToken is in sync.
+  // This prevents pages from mounting with accessToken=null and missing their
+  // initial data fetch (the effect fires once with null then never re-runs).
+  if (isLoading || (user && !accessToken)) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
@@ -38,6 +51,7 @@ export default function PortalLayout({
   if (!user) return null;
 
   return (
+    <NotificationProvider>
     <div className="flex min-h-screen bg-background">
       {/* Desktop sidebar - always visible */}
       <div className="hidden lg:block">
@@ -84,5 +98,6 @@ export default function PortalLayout({
         </main>
       </div>
     </div>
+    </NotificationProvider>
   );
 }

@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useRef, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
+import { isTicketsOnly } from "@/lib/features";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,7 +24,43 @@ import {
 
 type Step = "phone" | "otp" | "register";
 
+function GoogleIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 48 48"
+      aria-hidden="true"
+    >
+      <path
+        fill="#FFC107"
+        d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8a12 12 0 0 1 0-24c3 0 5.7 1.2 7.8 3.1l5.7-5.7A20 20 0 1 0 24 44a20 20 0 0 0 19.6-23.5z"
+      />
+      <path
+        fill="#FF3D00"
+        d="M6.3 14.7l6.6 4.8A12 12 0 0 1 24 12c3 0 5.7 1.2 7.8 3.1l5.7-5.7A20 20 0 0 0 6.3 14.7z"
+      />
+      <path
+        fill="#4CAF50"
+        d="M24 44c5.2 0 10-2 13.5-5.3l-6.2-5.3a12 12 0 0 1-7.3 2.6c-5.2 0-9.6-3.3-11.2-7.9l-6.6 5.1A20 20 0 0 0 24 44z"
+      />
+      <path
+        fill="#1976D2"
+        d="M43.6 20.5H42V20H24v8h11.3a12 12 0 0 1-4 5.4l6.1 5.3c-.4.4 6.6-4.8 6.6-14.7 0-1.3-.2-2.4-.4-3.5z"
+      />
+    </svg>
+  );
+}
+
 export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginContent />
+    </Suspense>
+  );
+}
+
+function LoginContent() {
   const [phone, setPhone] = useState("");
   const [step, setStep] = useState<Step>("phone");
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -40,14 +77,35 @@ export default function LoginPage() {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const { login, verifyOtp, user } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const googleError = searchParams.get("googleError");
+
+  useEffect(() => {
+    if (!googleError) return;
+    const map: Record<string, string> = {
+      not_configured: "Google sign-in isn't configured on this deployment yet.",
+      no_account:
+        "We couldn't find an account linked to that Google email. Ask your admin to add your email, or log in with phone OTP instead.",
+      email_not_verified:
+        "Your Google email isn't verified. Verify it with Google and try again.",
+      no_email: "Your Google account didn't share an email with us.",
+      state_mismatch: "Sign-in link expired. Please try again.",
+      exchange_failed: "Google sign-in failed. Please try again.",
+      missing_code: "Google sign-in was cancelled.",
+      session_failed: "Couldn't start your session. Please try again.",
+      missing_token: "Sign-in completed without a token. Please try again.",
+    };
+    setError(map[googleError] || "Google sign-in failed. Please try again.");
+  }, [googleError]);
 
   useEffect(() => {
     if (user) {
-      router.replace(
-        user.role === "ADMIN" || user.role === "SUPER_ADMIN"
-          ? "/admin/dashboard"
-          : "/dashboard"
-      );
+      const isAdmin = user.role === "ADMIN" || user.role === "SUPER_ADMIN";
+      if (isTicketsOnly()) {
+        router.replace(isAdmin ? "/admin/tickets" : "/tickets");
+      } else {
+        router.replace(isAdmin ? "/admin/dashboard" : "/dashboard");
+      }
     }
   }, [user, router]);
 
@@ -176,25 +234,46 @@ export default function LoginPage() {
           {/* Hero text */}
           <div className="space-y-6 max-w-md">
             <h2 className="text-4xl font-bold text-primary-foreground leading-tight">
-              Your Property,
-              <br />
-              <span className="bg-gradient-to-r from-accent to-primary-foreground bg-clip-text text-transparent">
-                One Portal Away
-              </span>
+              {isTicketsOnly() ? (
+                <>
+                  Your Questions,
+                  <br />
+                  <span className="bg-gradient-to-r from-accent to-primary-foreground bg-clip-text text-transparent">
+                    Answered Fast
+                  </span>
+                </>
+              ) : (
+                <>
+                  Your Property,
+                  <br />
+                  <span className="bg-gradient-to-r from-accent to-primary-foreground bg-clip-text text-transparent">
+                    One Portal Away
+                  </span>
+                </>
+              )}
             </h2>
             <p className="text-primary-foreground/50 text-lg leading-relaxed">
-              Track payments, monitor construction progress, manage documents —
-              everything about your property in one place.
+              {isTicketsOnly()
+                ? "Raise a ticket for any query about your property and stay in direct conversation with the ONE Group team."
+                : "Track payments, monitor construction progress, manage documents — everything about your property in one place."}
             </p>
 
             {/* Features */}
             <div className="grid grid-cols-2 gap-4 pt-4">
-              {[
-                { icon: "💰", label: "Payment Tracking" },
-                { icon: "🏗️", label: "Construction Updates" },
-                { icon: "📄", label: "Document Vault" },
-                { icon: "🎯", label: "Referral Rewards" },
-              ].map((f) => (
+              {(isTicketsOnly()
+                ? [
+                    { icon: "💬", label: "Raise a Ticket" },
+                    { icon: "🔔", label: "Live Updates" },
+                    { icon: "📎", label: "Share Details" },
+                    { icon: "✅", label: "Track to Resolution" },
+                  ]
+                : [
+                    { icon: "💰", label: "Payment Tracking" },
+                    { icon: "🏗️", label: "Construction Updates" },
+                    { icon: "📄", label: "Document Vault" },
+                    { icon: "🎯", label: "Referral Rewards" },
+                  ]
+              ).map((f) => (
                 <div
                   key={f.label}
                   className="flex items-center gap-3 p-3 rounded-lg bg-primary-foreground/10 border border-primary-foreground/10"
@@ -304,10 +383,18 @@ export default function LoginPage() {
                 </div>
                 <div className="relative flex justify-center text-xs">
                   <span className="bg-background px-4 text-muted-foreground uppercase tracking-wider">
-                    Admin Access
+                    Or
                   </span>
                 </div>
               </div>
+
+              <a
+                href="/api/auth/google"
+                className="w-full flex items-center justify-center gap-3 h-11 rounded-lg border border-border bg-white text-sm font-medium text-foreground hover:bg-gray-50 hover:border-gray-300 transition-all"
+              >
+                <GoogleIcon className="h-4 w-4" />
+                Continue with Google
+              </a>
 
               <button
                 onClick={() => {
@@ -391,14 +478,6 @@ export default function LoginPage() {
                   )}
                 </Button>
 
-                <div className="text-center">
-                  <p className="text-xs text-muted-foreground bg-muted inline-block px-3 py-1.5 rounded-full">
-                    Dev OTP:{" "}
-                    <span className="font-mono font-bold text-foreground">
-                      123456
-                    </span>
-                  </p>
-                </div>
               </form>
             </div>
           )}
@@ -514,10 +593,6 @@ export default function LoginPage() {
                       required
                     />
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    Dev code:{" "}
-                    <span className="font-mono font-bold">ONEGROUP2025</span>
-                  </p>
                 </div>
 
                 {error && (

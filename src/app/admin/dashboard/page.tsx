@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
+import { isTicketsOnly } from "@/lib/features";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,12 +38,17 @@ interface OverdueSummary {
 
 export default function AdminDashboardPage() {
   const { accessToken, user } = useAuth();
+  const router = useRouter();
   const [stats, setStats] = useState<DashboardStats>({
     totalCustomers: 0,
     totalBookings: 0,
     pendingPayments: 0,
     pendingImports: 0,
   });
+
+  useEffect(() => {
+    if (isTicketsOnly()) router.replace("/admin/tickets");
+  }, [router]);
   const [overdue, setOverdue] = useState<OverdueSummary | null>(null);
   const [running, setRunning] = useState(false);
   const [runMessage, setRunMessage] = useState<string | null>(null);

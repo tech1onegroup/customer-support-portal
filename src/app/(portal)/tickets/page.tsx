@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -32,6 +32,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Plus, MessageSquare, Clock } from "lucide-react";
+import {
+  AttachmentPicker,
+  appendAttachmentsToFormData,
+  filesFromClipboard,
+} from "@/components/shared/attachment-picker";
 
 interface Ticket {
   id: string;
@@ -80,9 +85,14 @@ export default function TicketsPage() {
   const router = useRouter();
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [creating, setCreating] = useState(false);
-  const [form, setForm] = useState({ category: "", subject: "", description: "" });
+  const [form, setForm] = useState({ category: "", subject: "", description: "", priority: "" });
+  const [attachments, setAttachments] = useState<File[]>([]);
+  const [formError, setFormError] = useState<string | null>(null);
+  const tokenRef = useRef(accessToken);
+  tokenRef.current = accessToken;
 
   useEffect(() => {
     if (!accessToken) return;
@@ -90,41 +100,62 @@ export default function TicketsPage() {
   }, [accessToken]);
 
   async function fetchTickets() {
+    const token = tokenRef.current;
+    if (!token) return;
     setLoading(true);
+    setFetchError(null);
     try {
       const res = await fetch("/api/tickets", {
-        headers: { Authorization: `Bearer ${accessToken}` },
+        headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
         const data = await res.json();
-        setTickets(data.tickets);
+        setTickets(data.tickets ?? []);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setFetchError(data.error || `Server error (${res.status})`);
       }
-    } catch (err) {
-      console.error("Failed to load tickets:", err);
+    } catch {
+      setFetchError("Could not reach the server. Check your connection.");
     } finally {
       setLoading(false);
     }
   }
 
   async function handleCreate() {
-    if (!form.category || !form.subject || !form.description) return;
+    if (
+      !form.category &&
+      !form.subject.trim() &&
+      !form.description.trim() &&
+      attachments.length === 0
+    )
+      return;
     setCreating(true);
+    setFormError(null);
     try {
+      const fd = new FormData();
+      fd.append("category", form.category);
+      fd.append("subject", form.subject);
+      fd.append("description", form.description);
+      if (form.priority) fd.append("priority", form.priority);
+      appendAttachmentsToFormData(fd, attachments);
       const res = await fetch("/api/tickets", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(form),
+        headers: { Authorization: `Bearer ${accessToken}` },
+        body: fd,
       });
       if (res.ok) {
-        setForm({ category: "", subject: "", description: "" });
+        setForm({ category: "", subject: "", description: "", priority: "" });
+        setAttachments([]);
         setDialogOpen(false);
         fetchTickets();
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setFormError(data.error || "Failed to create ticket");
       }
     } catch (err) {
       console.error("Failed to create ticket:", err);
+      setFormError("Failed to create ticket");
     } finally {
       setCreating(false);
     }
@@ -141,6 +172,15 @@ export default function TicketsPage() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
+      </div>
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 gap-4">
+        <p className="text-sm text-red-600 font-medium">{fetchError}</p>
+        <Button variant="outline" onClick={fetchTickets}>Retry</Button>
       </div>
     );
   }
@@ -163,7 +203,23 @@ export default function TicketsPage() {
             <DialogHeader>
               <DialogTitle>Create Support Ticket</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4 mt-4">
+            <div
+              className="space-y-4 mt-4"
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              onDrop={(e) => {
+                const dropped = Array.from(e.dataTransfer.files || []);
+                if (dropped.length === 0) return;
+                e.preventDefault();
+                e.stopPropagation();
+                setAttachments((prev) => [...prev, ...dropped].slice(0, 10));
+              }}
+            >
+              <p className="text-xs text-gray-500">
+                All fields are optional — fill in whatever helps us understand your issue.
+              </p>
               <div className="space-y-2">
                 <Label>Category</Label>
                 <Select
@@ -201,14 +257,37 @@ export default function TicketsPage() {
                   onChange={(e) =>
                     setForm((f) => ({ ...f, description: e.target.value }))
                   }
-                  placeholder="Describe your issue in detail"
+                  onPaste={(e) => {
+                    const pasted = filesFromClipboard(e);
+                    if (pasted.length > 0) {
+                      e.preventDefault();
+                      setAttachments((prev) =>
+                        [...prev, ...pasted].slice(0, 10)
+                      );
+                    }
+                  }}
+                  placeholder="Describe your issue in detail (drag, drop, or paste files)"
                   rows={4}
                 />
               </div>
+              <div className="space-y-2">
+                <Label>Attachments</Label>
+                <AttachmentPicker
+                  files={attachments}
+                  onChange={setAttachments}
+                />
+              </div>
+              {formError && (
+                <p className="text-sm text-red-600">{formError}</p>
+              )}
               <Button
                 onClick={handleCreate}
                 disabled={
-                  creating || !form.category || !form.subject || !form.description
+                  creating ||
+                  (!form.category &&
+                    !form.subject.trim() &&
+                    !form.description.trim() &&
+                    attachments.length === 0)
                 }
                 className="w-full"
               >
@@ -242,14 +321,12 @@ export default function TicketsPage() {
                   <TableHead>Subject</TableHead>
                   <TableHead>Category</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Priority</TableHead>
                   <TableHead>Date</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {tickets.map((ticket) => {
                   const sc = statusConfig[ticket.status];
-                  const pc = priorityConfig[ticket.priority];
                   return (
                     <TableRow
                       key={ticket.id}
@@ -268,11 +345,6 @@ export default function TicketsPage() {
                       <TableCell>
                         <Badge variant={sc?.variant || "secondary"}>
                           {sc?.label || ticket.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={pc?.variant || "secondary"}>
-                          {pc?.label || ticket.priority}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-gray-500">
